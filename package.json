@@ -1,0 +1,37 @@
+{
+  "name": "@blu_ai/frontend",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "dev:admin": "lerna run dev --scope=@blu_ai/admin",
+    "dev:customer": "lerna run dev --scope=@blu_ai/customer",
+    "build:admin": "lerna run build --scope=@blu_ai/admin",
+    "build:customer": "lerna run build --scope=@blu_ai/customer",
+    "build:all": "lerna run build",
+    "test": "lerna run test",
+    "test:admin": "lerna run test --scope=@blu_ai/admin",
+    "test:customer": "lerna run test --scope=@blu_ai/customer",
+    "lint": "lerna run lint",
+    "lint:fix": "lerna run lint:fix",
+    "deploy:admin": "lerna run deploy --scope=@blu_ai/admin",
+    "deploy:customer": "lerna run deploy --scope=@blu_ai/customer",
+    "deploy:all": "lerna run deploy",
+    "deploy:staging": "lerna run deploy:staging"
+  },
+  "devDependencies": {
+    "lerna": "^7.0.0",
+    "typescript": "^5.0.0",
+    "prettier": "^3.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
