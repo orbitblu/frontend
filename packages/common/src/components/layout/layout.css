@@ -1,0 +1,194 @@
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-layout__header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.main-layout__content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.main-layout__sidebar {
+  width: 250px;
+  background-color: #f5f5f5;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
+}
+
+.main-layout__main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.main-layout__footer {
+  background-color: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+  padding: 1rem;
+  text-align: center;
+}
+
+.main-layout__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* Loading animation */
+.main-layout[aria-busy="true"] {
+  position: relative;
+}
+
+.main-layout[aria-busy="true"]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 1000;
+}
+
+/* Header styles */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: white;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header__brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header__logo {
+  height: 40px;
+  width: auto;
+}
+
+.header__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.header__nav {
+  flex: 1;
+  margin: 0 2rem;
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header__logout {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.header__logout:hover {
+  background-color: #e0e0e0;
+}
+
+.header__logout:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+/* Navigation styles */
+.navigation {
+  width: 100%;
+}
+
+.navigation--horizontal .navigation__list {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navigation--vertical .navigation__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.navigation__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navigation__item {
+  margin: 0;
+}
+
+.navigation__link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: #666;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.navigation__link:hover {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.navigation__link:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+.navigation__link--active {
+  background-color: #e0e0e0;
+  color: #333;
+  font-weight: 500;
+}
+
+.navigation__link[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.navigation__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.navigation__label {
+  flex: 1;
+} 
