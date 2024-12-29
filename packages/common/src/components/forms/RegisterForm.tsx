@@ -81,11 +81,12 @@ export const RegisterForm: React.FC = () => {
 
     setIsLoading(true);
     try {
-      await register(
-        formData.username,
-        formData.email,
-        formData.password
-      );
+      await register({
+        name: formData.username,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword
+      });
     } catch (error) {
       setErrors({
         ...errors,

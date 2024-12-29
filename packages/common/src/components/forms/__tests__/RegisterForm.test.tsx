@@ -13,7 +13,7 @@ jest.mock('../../../contexts/AuthContext', () => ({
 }));
 
 describe('RegisterForm', () => {
-  const mockRegister = jest.fn() as jest.MockedFunction<(username: string, email: string, password: string) => Promise<void>>;
+  const mockRegister = jest.fn() as jest.MockedFunction<(credentials: { name: string; email: string; password: string; confirmPassword: string; }) => Promise<void>>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -107,11 +107,12 @@ describe('RegisterForm', () => {
     await userEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
-      expect(mockRegister).toHaveBeenCalledWith(
-        validData.username,
-        validData.email,
-        validData.password
-      );
+      expect(mockRegister).toHaveBeenCalledWith({
+        name: validData.username,
+        email: validData.email,
+        password: validData.password,
+        confirmPassword: validData.password
+      });
     });
   });
 

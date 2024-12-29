@@ -13,7 +13,7 @@ jest.mock('../../../contexts/AuthContext', () => ({
 }));
 
 describe('LoginForm', () => {
-  const mockLogin = jest.fn() as jest.MockedFunction<(username: string, password: string) => Promise<void>>;
+  const mockLogin = jest.fn() as jest.MockedFunction<(credentials: { email: string; password: string; }) => Promise<void>>;
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
 
@@ -38,7 +38,10 @@ describe('LoginForm', () => {
     await userEvent.click(screen.getByRole('button', { name: /log in/i }));
 
     await waitFor(() => {
-      expect(mockLogin).toHaveBeenCalledWith('testuser', 'password123');
+      expect(mockLogin).toHaveBeenCalledWith({
+        email: 'testuser',
+        password: 'password123'
+      });
       expect(mockOnSuccess).toHaveBeenCalled();
     });
   });

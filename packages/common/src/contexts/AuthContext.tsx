@@ -1,20 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authApi } from '../services/api/auth';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: string;
-}
+import authService, { UserProfile, LoginCredentials, RegisterCredentials } from '../services/api/auth';
 
 export interface AuthContextType {
   isAuthenticated: boolean;
-  user: User | null;
+  user: UserProfile | null;
   loading: boolean;
   error: string | null;
-  login: (username: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string) => Promise<void>;
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (credentials: RegisterCredentials) => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
 }
@@ -22,7 +15,7 @@ export interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,18 +24,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const initializeAuth = async () => {
       setLoading(true);
       setError(null);
-      let token: string | null = null;
       
-      try {
-        token = localStorage.getItem('token');
-      } catch (e) {
-        console.error('Error accessing localStorage:', e);
-        setError(e instanceof Error ? e.message : 'Error accessing localStorage');
-        setLoading(false);
-        return;
-      }
-      
-      if (!token) {
+      if (!authService.isAuthenticated()) {
         setUser(null);
         setIsAuthenticated(false);
         setLoading(false);
@@ -50,20 +33,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       try {
-        const userData = await authApi.me();
-        if (!userData) {
-          throw new Error('No user data returned');
-        }
-        
+        const userData = await authService.getProfile();
         setUser(userData);
         setIsAuthenticated(true);
       } catch (error) {
         console.error('Auth initialization error:', error);
-        try {
-          localStorage.removeItem('token');
-        } catch (e) {
-          console.error('Error removing token from localStorage:', e);
-        }
+        await authService.logout();
         setUser(null);
         setIsAuthenticated(false);
         setError(error instanceof Error ? error.message : 'Authentication failed');
@@ -75,45 +50,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initializeAuth();
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const login = async (credentials: LoginCredentials) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await authApi.login({ username, password });
-      if (!response?.token || !response?.user) {
-        throw new Error('Invalid response from server');
-      }
-      
-      // Store token first
-      localStorage.setItem('token', response.token);
-      // Then update state
+      const response = await authService.login(credentials);
       setUser(response.user);
       setIsAuthenticated(true);
     } catch (error) {
-      localStorage.removeItem('token');
+      await authService.logout();
       setUser(null);
       setIsAuthenticated(false);
       setError(error instanceof Error ? error.message : 'Login failed');
-      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (username: string, email: string, password: string) => {
+  const register = async (credentials: RegisterCredentials) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await authApi.register({ username, email, password });
-      localStorage.setItem('token', response.token);
+      const response = await authService.register(credentials);
       setUser(response.user);
       setIsAuthenticated(true);
     } catch (error) {
-      localStorage.removeItem('token');
+      await authService.logout();
       setUser(null);
       setIsAuthenticated(false);
       setError(error instanceof Error ? error.message : 'Registration failed');
-      throw error;
     } finally {
       setLoading(false);
     }
@@ -121,18 +86,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      // First clear local state and token
-      localStorage.removeItem('token');
+      await authService.logout();
       setUser(null);
       setIsAuthenticated(false);
       setError(null);
-      
-      // Then call API
-      await authApi.logout();
     } catch (error) {
       console.error('Logout error:', error);
       setError(error instanceof Error ? error.message : 'Logout failed');
       // Even if API fails, we want to stay logged out
+      setUser(null);
+      setIsAuthenticated(false);
     }
   };
 

@@ -10,6 +10,7 @@ This repository contains the frontend applications for the Blu AI project, inclu
 - Test coverage for core functionality ✓
 - Monorepo workspace setup complete ✓
 - Error handling for localStorage and API failures ✓
+- API integration configuration ✓
 
 ### Core Dependencies
 - React 19.0.0
@@ -57,6 +58,100 @@ This repository contains the frontend applications for the Blu AI project, inclu
 - Error boundaries and global error handling
 - Performance optimizations
 - Accessibility improvements
+
+## API Integration
+
+### Prerequisites
+
+1. Running API server (default: http://localhost:5000)
+2. Environment configuration
+3. CORS enabled on API for development
+
+### Environment Setup
+
+1. Copy the example environment file:
+   ```bash
+   cp config/env.example .env
+   ```
+
+2. Update the environment variables:
+   ```bash
+   # API Configuration
+   NEXT_PUBLIC_API_URL=http://localhost:5000  # Your API server URL
+   NEXT_PUBLIC_API_VERSION=v1                 # API version
+
+   # Authentication
+   NEXT_PUBLIC_AUTH_TOKEN_NAME=token          # LocalStorage token key
+   NEXT_PUBLIC_AUTH_REFRESH_TOKEN_NAME=refresh_token
+
+   # Environment
+   NEXT_PUBLIC_ENVIRONMENT=development        # or production
+
+   # Application URLs
+   NEXT_PUBLIC_ADMIN_URL=http://localhost:3001
+   NEXT_PUBLIC_CUSTOMER_URL=http://localhost:3000
+   ```
+
+### API Client Configuration
+
+The API client is configured in `packages/common/src/services/api/client.ts` with:
+
+- Automatic token management
+- Error handling
+- Request/response interceptors
+- Environment-based configuration
+- CORS support for development
+
+### Available API Services
+
+1. Authentication (`packages/common/src/services/api/auth.ts`):
+   - Registration
+   - Login
+   - Logout
+   - Token refresh
+   - User information
+
+### Error Handling
+
+The API client handles various error scenarios:
+
+- Authentication errors (401)
+- Rate limiting (429)
+- Validation errors (400)
+- Server errors (500+)
+- Network errors
+- localStorage access errors
+
+### Development Setup
+
+1. Start the API server:
+   ```bash
+   # In the API repository
+   python -m flask run
+   ```
+
+2. Start the frontend development server:
+   ```bash
+   # For admin interface
+   npm run dev:admin
+
+   # For customer dashboard
+   npm run dev:customer
+   ```
+
+### Production Deployment
+
+1. Set up production environment:
+   ```bash
+   cp config/env.production .env
+   ```
+
+2. Build the applications:
+   ```bash
+   npm run build
+   ```
+
+3. Deploy to production servers
 
 ## Repository Structure
 

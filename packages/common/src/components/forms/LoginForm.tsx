@@ -20,7 +20,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError }) => {
     setIsLoading(true);
 
     try {
-      await login(username, password);
+      await login({ email: username, password });
       onSuccess?.();
     } catch (err) {
       const errorMessage = err instanceof ApiError 
