@@ -11,8 +11,8 @@
 ## Branch Structure
 
 ```
-master (stable)
-├── develop (main development branch)
+main (production)
+├── develop (development)
 │   ├── feature/* (new features)
 │   ├── bugfix/* (bug fixes)
 │   └── release/* (release preparation)
@@ -21,10 +21,10 @@ master (stable)
 
 ## Branch Types
 
-1. **master**
+1. **main**
    - Production-ready code
-   - Always stable
    - Protected branch
+   - Triggers deployment to production
    - Requires pull request and review
 
 2. **develop**
@@ -48,16 +48,16 @@ master (stable)
 5. **release branches**
    - Named: `release/version`
    - Created from: `develop`
-   - Merged into: `master` and `develop`
+   - Merged into: `main` and `develop`
    - Example: `release/1.0.0`
 
 6. **hotfix branches**
    - Named: `hotfix/description`
-   - Created from: `master`
-   - Merged into: `master` and `develop`
+   - Created from: `main`
+   - Merged into: `main` and `develop`
    - Example: `hotfix/critical-auth-fix`
 
-## Workflow
+## Workflow Examples
 
 ### Feature Development
 ```bash
@@ -107,14 +107,14 @@ git commit -m "chore: prepare 1.0.0 release"
 # Push to remote
 git push -u origin release/1.0.0
 
-# Create pull request to master
+# Create pull request to main
 ```
 
 ### Hotfixes
 ```bash
 # Create hotfix branch
-git checkout master
-git pull origin master
+git checkout main
+git pull origin main
 git checkout -b hotfix/critical-fix
 
 # Fix the issue...
@@ -124,7 +124,7 @@ git commit -m "fix: critical issue description"
 # Push to remote
 git push -u origin hotfix/critical-fix
 
-# Create pull request to master AND develop
+# Create pull request to main AND develop
 ```
 
 ## Commit Message Convention
@@ -139,25 +139,9 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) specific
 - `test:` - Adding or updating tests
 - `chore:` - Maintenance tasks
 
-Example:
-```bash
-git commit -m "feat: add user authentication system"
-git commit -m "fix: resolve token validation issue"
-git commit -m "docs: update README with new features"
-```
-
-## Pull Request Process
-
-1. Create PR from your branch to appropriate target
-2. Fill out PR template
-3. Request reviews from team members
-4. Address review comments
-5. Merge once approved
-6. Delete branch after merge
-
 ## Protection Rules
 
-1. **master branch**
+1. **main branch**
    - No direct pushes
    - Requires pull request
    - Requires review approval
