@@ -1,38 +1,25 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  displayName: 'customer',
+  preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: [
-    '<rootDir>/src/test/setup.ts',
-    '<rootDir>/src/setupTests.ts'
-  ],
-  transform: {
-    '^.+\\.(ts|tsx)$': ['babel-jest', {
-      presets: ['next/babel'],
-      plugins: ['@babel/plugin-transform-modules-commonjs']
-    }],
-  },
+  setupFilesAfterEnv: ['@testing-library/jest-dom'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@orbitblu/common/(.*)$': '<rootDir>/../common/src/$1',
-    '^@orbitblu/common$': '<rootDir>/../common/src'
+    '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
   },
-  testMatch: [
-    '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',
-    '<rootDir>/src/**/*.{spec,test}.{ts,tsx}',
-  ],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-  coverageDirectory: '../../coverage/packages/customer',
-  transformIgnorePatterns: [
-    '/node_modules/(?!@orbitblu/common)',
-  ],
-  rootDir: '.',
-  roots: ['<rootDir>/src', '<rootDir>/../common/src'],
-  modulePaths: ['<rootDir>/../common/src'],
-  moduleDirectories: ['node_modules', '<rootDir>/../common/src'],
-  resolver: null,
-  testEnvironmentOptions: {
-    url: 'http://localhost',
+  transform: {
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: '<rootDir>/tsconfig.json',
+      isolatedModules: true,
+      useESM: true,
+    }],
   },
-  verbose: true,
-}; 
+  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  globals: {
+    'ts-jest': {
+      tsconfig: '<rootDir>/tsconfig.json',
+      useESM: true,
+    },
+  },
+} 
