@@ -11,9 +11,8 @@ import type { NextRouter } from 'next/router';
 // Mock the AuthContext module
 jest.mock('@orbitblu/common/contexts/AuthContext', () => {
   const mockUseAuth = jest.fn();
-  const AuthProvider = ({ children }) => {
-    const React = require('react');
-    return React.createElement(React.Fragment, null, children);
+  const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    return <>{children}</>;
   };
   return {
     useAuth: mockUseAuth,
@@ -22,37 +21,31 @@ jest.mock('@orbitblu/common/contexts/AuthContext', () => {
 });
 
 // Mock the ProtectedRoute component
-jest.mock('@orbitblu/common/components/ProtectedRoute', () => {
-  const React = require('react');
-  return {
-    ProtectedRoute: ({ children, requiredRole }) => {
-      const { useAuth } = require('@orbitblu/common/contexts/AuthContext');
-      const { useRouter } = require('next/router');
-      const auth = useAuth();
-      const router = useRouter();
+jest.mock('@orbitblu/common/components/ProtectedRoute', () => ({
+  ProtectedRoute: ({ children, requiredRole }: { children: React.ReactNode; requiredRole: string }) => {
+    const { useAuth } = jest.requireActual('@orbitblu/common/contexts/AuthContext');
+    const { useRouter } = jest.requireActual('next/router');
+    const auth = useAuth();
+    const router = useRouter();
 
-      React.useEffect(() => {
-        if (!auth.isAuthenticated || (auth.user && auth.user.role !== requiredRole)) {
-          router.push('/auth/login');
-        }
-      }, [auth.isAuthenticated, auth.user, router, requiredRole]);
-
+    React.useEffect(() => {
       if (!auth.isAuthenticated || (auth.user && auth.user.role !== requiredRole)) {
-        return null;
+        router.push('/auth/login');
       }
+    }, [auth.isAuthenticated, auth.user, router, requiredRole]);
 
-      return React.createElement(React.Fragment, null, children);
-    },
-  };
-});
+    if (!auth.isAuthenticated || (auth.user && auth.user.role !== requiredRole)) {
+      return null;
+    }
+
+    return <>{children}</>;
+  },
+}));
 
 // Mock the Layout component
-jest.mock('@orbitblu/common/components/Layout', () => {
-  const React = require('react');
-  return {
-    Layout: ({ children }) => React.createElement('div', { 'data-testid': 'layout' }, children),
-  };
-});
+jest.mock('@orbitblu/common/components/Layout', () => ({
+  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+}));
 
 jest.mock('next/router', () => ({
   useRouter: jest.fn(),
