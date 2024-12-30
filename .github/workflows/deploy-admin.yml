@@ -1,0 +1,61 @@
+name: Deploy Admin Frontend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/packages/admin/**'
+      - 'frontend/packages/common/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install Dependencies
+        working-directory: frontend
+        run: npm ci
+      
+      - name: Build
+        working-directory: frontend
+        run: |
+          cd packages/admin
+          npm run build
+        env:
+          NEXT_PUBLIC_API_URL: https://api.orbitblu.net
+          NEXT_PUBLIC_API_VERSION: v1
+          NEXT_PUBLIC_API_TIMEOUT: 30000
+          NEXT_PUBLIC_MAX_RETRIES: 3
+          NEXT_PUBLIC_RETRY_DELAY: 1000
+          NEXT_PUBLIC_AUTH_TOKEN_NAME: orbitblu_token
+      
+      - name: Deploy to Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "frontend/packages/admin/dist/*"
+          target: "/home/blu_ai/frontend/packages/admin/dist"
+          strip_components: 4
+          rm: true
+      
+      - name: Set Permissions
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo chown -R blu_ai:blu_ai /home/blu_ai/frontend/packages/admin/dist
+            sudo chmod -R 755 /home/blu_ai/frontend/packages/admin/dist
