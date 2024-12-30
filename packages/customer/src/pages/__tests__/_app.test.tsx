@@ -4,7 +4,6 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import App from '../_app';
-import { useAuth } from '@orbitblu/common/contexts/AuthContext';
 import { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import type { NextRouter } from 'next/router';
@@ -22,16 +21,19 @@ jest.mock('@orbitblu/common/contexts/AuthContext', () => {
 // Mock the ProtectedRoute component
 jest.mock('@orbitblu/common/components/ProtectedRoute', () => ({
   ProtectedRoute: ({ children, requiredRole }: { children: React.ReactNode; requiredRole: string }) => {
-    const { isAuthenticated, user } = useAuth();
+    // Import the mock at the top level
+    const { useAuth } = require('@orbitblu/common/contexts/AuthContext');
+    const { useRouter } = require('next/router');
+    const auth = useAuth();
     const router = useRouter();
 
     React.useEffect(() => {
-      if (!isAuthenticated || (user && user.role !== requiredRole)) {
+      if (!auth.isAuthenticated || (auth.user && auth.user.role !== requiredRole)) {
         router.push('/auth/login');
       }
-    }, [isAuthenticated, user, router, requiredRole]);
+    }, [auth.isAuthenticated, auth.user, router, requiredRole]);
 
-    if (!isAuthenticated || (user && user.role !== requiredRole)) {
+    if (!auth.isAuthenticated || (auth.user && auth.user.role !== requiredRole)) {
       return null;
     }
 
@@ -48,7 +50,7 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn(),
 }));
 
-const mockUseAuth = useAuth as jest.Mock;
+const mockUseAuth = jest.requireMock('@orbitblu/common/contexts/AuthContext').useAuth;
 const mockUseRouter = useRouter as jest.Mock;
 
 describe('Customer App', () => {
@@ -110,7 +112,6 @@ describe('Customer App', () => {
       />
     );
 
-    // Wait for any effects to complete
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
@@ -145,7 +146,6 @@ describe('Customer App', () => {
       />
     );
 
-    // Wait for any effects to complete
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
@@ -174,7 +174,6 @@ describe('Customer App', () => {
       />
     );
 
-    // Wait for any effects to complete
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
