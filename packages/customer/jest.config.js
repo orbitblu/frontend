@@ -7,9 +7,9 @@ module.exports = {
     '<rootDir>/src/setupTests.ts'
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: '<rootDir>/tsconfig.json',
-      jsx: 'react',
+    '^.+\\.(ts|tsx)$': ['babel-jest', {
+      presets: ['next/babel'],
+      plugins: ['@babel/plugin-transform-modules-commonjs']
     }],
   },
   moduleNameMapper: {
