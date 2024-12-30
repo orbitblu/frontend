@@ -6,6 +6,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { theme } from '@orbitblu/common/styles/theme';
 import { useRouter } from 'next/router';
+import type { NextComponentType, NextPageContext } from 'next';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,10 +17,17 @@ const queryClient = new QueryClient({
   },
 });
 
-function AppContent({ Component, pageProps }: AppProps) {
+interface CustomerPageProps {
+  requireAuth?: boolean;
+}
+
+type CustomerAppProps = AppProps & {
+  Component: NextComponentType<NextPageContext, unknown, CustomerPageProps>;
+};
+
+function AppContent({ Component, pageProps }: CustomerAppProps) {
   const { isAuthenticated, user } = useAuth();
   const router = useRouter();
-  const AnyComponent = Component as any;
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -32,12 +40,12 @@ function AppContent({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AnyComponent {...pageProps} />
+      <Component {...pageProps} />
     </ThemeProvider>
   );
 }
 
-export default function App(props: AppProps) {
+export default function App(props: CustomerAppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

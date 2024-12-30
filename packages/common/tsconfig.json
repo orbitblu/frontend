@@ -1,23 +1,18 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "dist",
+    "jsx": "react",
     "composite": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "rootDir": ".",
-    "outDir": "dist",
-    "jsx": "react",
-    "types": ["jest"],
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true,
-    "typeRoots": ["../../node_modules/@types", "./src/types"],
+    "types": ["node", "jest"],
     "paths": {
       "@/*": ["src/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/types/**/*.d.ts"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "**/__tests__/**", "**/*.test.ts", "**/*.test.tsx"]
 } 

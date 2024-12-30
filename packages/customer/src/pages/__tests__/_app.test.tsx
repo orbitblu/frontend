@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import App from '../_app';
 import { useAuth } from '@orbitblu/common/contexts/AuthContext';
 import { AppProps } from 'next/app';
@@ -18,6 +18,31 @@ jest.mock('@orbitblu/common/contexts/AuthContext', () => {
     AuthProvider,
   };
 });
+
+// Mock the ProtectedRoute component
+jest.mock('@orbitblu/common/components/ProtectedRoute', () => ({
+  ProtectedRoute: ({ children, requiredRole }: { children: React.ReactNode; requiredRole: string }) => {
+    const { isAuthenticated, user } = useAuth();
+    const router = useRouter();
+
+    React.useEffect(() => {
+      if (!isAuthenticated || (user && user.role !== requiredRole)) {
+        router.push('/auth/login');
+      }
+    }, [isAuthenticated, user, router, requiredRole]);
+
+    if (!isAuthenticated || (user && user.role !== requiredRole)) {
+      return null;
+    }
+
+    return <>{children}</>;
+  },
+}));
+
+// Mock the Layout component
+jest.mock('@orbitblu/common/components/Layout', () => ({
+  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+}));
 
 jest.mock('next/router', () => ({
   useRouter: jest.fn(),
@@ -59,7 +84,7 @@ describe('Customer App', () => {
     mockUseRouter.mockReturnValue(mockRouter);
   });
 
-  it('renders authenticated customer content', () => {
+  it('renders authenticated customer content', async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       user: {
@@ -85,10 +110,16 @@ describe('Customer App', () => {
       />
     );
 
+    // Wait for any effects to complete
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
     expect(screen.getByTestId('customer-content')).toBeInTheDocument();
+    expect(mockRouter.push).not.toHaveBeenCalled();
   });
 
-  it('redirects admin users to admin portal', () => {
+  it('redirects admin users to admin portal', async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       user: {
@@ -114,10 +145,15 @@ describe('Customer App', () => {
       />
     );
 
+    // Wait for any effects to complete
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
     expect(mockRouter.push).toHaveBeenCalledWith('/admin');
   });
 
-  it('redirects unauthenticated users to login', () => {
+  it('redirects unauthenticated users to login', async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,
       user: null,
@@ -137,6 +173,11 @@ describe('Customer App', () => {
         router={mockRouter as AppProps['router']} 
       />
     );
+
+    // Wait for any effects to complete
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
 
     expect(mockRouter.push).toHaveBeenCalledWith('/auth/login');
   });

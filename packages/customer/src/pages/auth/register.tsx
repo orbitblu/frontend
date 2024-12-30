@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '@orbitblu/common/src/contexts/AuthContext';
+import { useAuth } from '@orbitblu/common/contexts/AuthContext';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import {
@@ -11,40 +11,29 @@ import {
   Typography,
   Alert,
   Paper,
-  Link as MuiLink,
 } from '@mui/material';
-import Link from 'next/link';
 
 const validationSchema = yup.object({
-  username: yup
-    .string()
-    .min(3, 'Username must be at least 3 characters')
-    .max(30, 'Username must be at most 30 characters')
-    .required('Username is required'),
-  email: yup
-    .string()
-    .email('Enter a valid email')
-    .required('Email is required'),
+  name: yup.string().required('Name is required'),
+  email: yup.string().email('Enter a valid email').required('Email is required'),
   password: yup
     .string()
-    .min(8, 'Password must be at least 8 characters')
-    .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .matches(/[0-9]/, 'Password must contain at least one number')
+    .min(8, 'Password should be of minimum 8 characters length')
     .required('Password is required'),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password')], 'Passwords must match')
-    .required('Confirm your password'),
+    .required('Confirm password is required'),
 });
 
 export default function Register() {
   const router = useRouter();
   const { register, error } = useAuth();
+  const redirect = router.query.redirect as string;
 
   const formik = useFormik({
     initialValues: {
-      username: '',
+      name: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -52,8 +41,13 @@ export default function Register() {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        await register(values.username, values.email, values.password);
-        router.push('/');
+        await register({
+          name: values.name,
+          email: values.email,
+          password: values.password,
+          confirmPassword: values.confirmPassword,
+        });
+        router.push(redirect || '/');
       } catch (err) {
         // Error is handled by AuthContext
       }
@@ -81,7 +75,7 @@ export default function Register() {
           }}
         >
           <Typography component="h1" variant="h5">
-            Create Account
+            Sign Up
           </Typography>
 
           {error && (
@@ -94,15 +88,14 @@ export default function Register() {
             <TextField
               margin="normal"
               fullWidth
-              id="username"
-              name="username"
-              label="Username"
-              autoComplete="username"
-              autoFocus
-              value={formik.values.username}
+              id="name"
+              name="name"
+              label="Full Name"
+              autoComplete="name"
+              value={formik.values.name}
               onChange={formik.handleChange}
-              error={formik.touched.username && Boolean(formik.errors.username)}
-              helperText={formik.touched.username && formik.errors.username}
+              error={formik.touched.name && Boolean(formik.errors.name)}
+              helperText={formik.touched.name && formik.errors.name}
             />
             <TextField
               margin="normal"
@@ -149,13 +142,8 @@ export default function Register() {
               sx={{ mt: 3, mb: 2 }}
               disabled={formik.isSubmitting}
             >
-              {formik.isSubmitting ? 'Creating Account...' : 'Create Account'}
+              {formik.isSubmitting ? 'Signing up...' : 'Sign Up'}
             </Button>
-            <Box sx={{ textAlign: 'center' }}>
-              <Link href="/auth/login" passHref legacyBehavior>
-                <MuiLink variant="body2">Already have an account? Sign in</MuiLink>
-              </Link>
-            </Box>
           </Box>
         </Paper>
       </Box>

@@ -1,46 +1,19 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import type { AppProps } from 'next/app';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { AuthProvider, useAuth } from '@orbitblu/common/contexts/AuthContext';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { theme } from '@orbitblu/common/styles/theme';
-import { useRouter } from 'next/router';
+import { AuthProvider } from '@orbitblu/common/contexts/AuthContext';
+import { ProtectedRoute } from '@orbitblu/common/components/ProtectedRoute';
+import { Layout } from '@orbitblu/common/components/Layout';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: false,
-    },
-  },
-});
-
-function AppContent({ Component, pageProps }: AppProps) {
-  const { isAuthenticated, user } = useAuth();
-  const router = useRouter();
-  const AnyComponent = Component as any;
-
-  useEffect(() => {
-    if (!isAuthenticated || (user && user.role !== 'admin')) {
-      router.push('/auth/login');
-    }
-  }, [isAuthenticated, user, router]);
-
+function AdminApp({ Component, pageProps }: AppProps) {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AnyComponent {...pageProps} />
-    </ThemeProvider>
+    <AuthProvider>
+      <ProtectedRoute requiredRole="admin">
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </ProtectedRoute>
+    </AuthProvider>
   );
 }
 
-export default function App(props: AppProps) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppContent {...props} />
-      </AuthProvider>
-    </QueryClientProvider>
-  );
-} 
+export default AdminApp; 

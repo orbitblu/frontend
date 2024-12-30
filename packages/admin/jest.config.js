@@ -2,7 +2,10 @@
 module.exports = {
   displayName: 'admin',
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+  setupFilesAfterEnv: [
+    '<rootDir>/src/test/setup.ts',
+    '<rootDir>/src/setupTests.ts'
+  ],
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
       tsconfig: '<rootDir>/tsconfig.json',
@@ -12,6 +15,7 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@orbitblu/common/(.*)$': '<rootDir>/../common/src/$1',
+    '^@orbitblu/common$': '<rootDir>/../common/src'
   },
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',

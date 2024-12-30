@@ -1,22 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ['@orbitblu/common'],
-  env: {
-    API_URL: process.env.API_URL || 'http://localhost:8000',
+  output: 'export',
+  distDir: 'dist',
+  eslint: {
+    ignoreDuringBuilds: false,
   },
-  async redirects() {
-    return [
-      {
-        source: '/login',
-        destination: '/auth/login',
-        permanent: true,
-      },
-    ];
-  },
-  webpack: (config) => {
-    // Add any custom webpack configuration here
-    return config;
+  typescript: {
+    ignoreBuildErrors: false,
   },
 };
 
